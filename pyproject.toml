@@ -1,0 +1,14 @@
+[project]
+name = "ptit-atbmtt"
+version = "0.1.0"
+description = "Demo Chương 5: Xây dựng mô hình minh họa phát hiện rò rỉ dữ liệu"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "jupyter>=1.1.1",
+    "matplotlib>=3.10.1",
+    "numpy>=2.2.3",
+    "pandas>=2.2.3",
+    "scikit-learn>=1.6.1",
+    "seaborn>=0.13.2",
+]

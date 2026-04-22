@@ -1,0 +1,25 @@
+# Lọc các file bytecode của Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Lọc môi trường ảo (Virtual environments)
+.venv/
+venv/
+env/
+.env
+
+# Lọc các công cụ quản lý package (uv, pip)
+.uv/
+.uv.lock
+
+# Lọc Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Thiết lập cho dự án Demo này
+data/*.csv
+outputs/*.pkl
+
+# Nếu muốn bỏ qua hoàn toàn thư mục data và outputs (Bỏ comment cấu hình dưới)
+# data/
+# outputs/
