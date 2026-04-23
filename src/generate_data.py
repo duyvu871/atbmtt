@@ -59,18 +59,22 @@ def _generate_normal_records(n: int) -> pd.DataFrame:
         )
 
         src_ip = _random_ip(INTERNAL_SUBNETS)
-
-        # 70% kết nối nội bộ, 30% ra ngoài
         is_external = int(np.random.random() < 0.30)
         dst_ip = _random_ip(EXTERNAL_SUBNETS if is_external else INTERNAL_SUBNETS)
-
         dst_port = int(np.random.choice(NORMAL_PORTS))
         protocol = np.random.choice(PROTOCOLS, p=PROTOCOL_WEIGHTS_NORMAL)
 
-        # Lưu lượng bình thường: bytes_sent thấp (trung bình ~50 KB)
-        bytes_sent = float(np.random.exponential(50))
-        bytes_recv = float(np.random.exponential(80))
-        duration = float(np.random.exponential(30))  # ~30 giây
+        # TẠO NHIỄU GIẤU BÀI: 15% Normal là người dùng upload file nặng (như gửi Video/Backup)
+        # Logistic Regression sẽ rất dễ bắt nhầm nhóm này làm False Positive
+        if np.random.random() < 0.15:
+            bytes_sent = float(np.random.uniform(300, 3000)) # Rất giống Hacker
+            bytes_recv = float(np.random.uniform(10, 100))
+            # Tuy nhiên, người hiền lành thường upload vào giờ hành chính HOẶC vào server nội bộ
+        else:
+            bytes_sent = float(np.random.exponential(30))
+            bytes_recv = float(np.random.exponential(150))
+
+        duration = float(np.random.exponential(40))
 
         records.append({
             "timestamp": timestamp,
@@ -92,20 +96,18 @@ def _generate_normal_records(n: int) -> pd.DataFrame:
 def _generate_leakage_records(n: int) -> pd.DataFrame:
     """Sinh bản ghi hành vi rò rỉ dữ liệu."""
     base_date = datetime(2025, 10, 1)
-    noise_count = int(n * 0.20)  # ~20% có nhiễu
+    noise_count = int(n * 0.30)  # ~30% có nhiễu thay vì 20%
     records = []
 
     for i in range(n):
         is_noisy = i < noise_count
 
-        # Ngoài giờ hành chính: trước 8h hoặc sau 18h
-        if is_noisy and np.random.random() < 0.5:
-            hour = int(np.random.normal(13, 3))  # có thể trong giờ
-            hour = int(np.clip(hour, 0, 23))
+        # Kẻ gian thường tuồn ngoài giờ (18h-8h sáng hôm sau)
+        # NHƯNG đôi khi lẩn trốn vào giờ hành chính (nhiễu)
+        if is_noisy and np.random.random() < 0.6:
+            hour = int(np.clip(np.random.normal(14, 2), 0, 23)) # Lẻn vào giờ làm
         else:
-            hour = np.random.choice(
-                list(range(0, 8)) + list(range(19, 24))
-            )
+            hour = np.random.choice(list(range(0, 8)) + list(range(19, 24)))
 
         timestamp = base_date + timedelta(
             days=np.random.randint(0, 30),
@@ -116,30 +118,26 @@ def _generate_leakage_records(n: int) -> pd.DataFrame:
 
         src_ip = _random_ip(INTERNAL_SUBNETS)
 
-        # Leakage luôn gửi ra ngoài (trừ nhiễu)
-        if is_noisy and np.random.random() < 0.3:
+        # Leakage đa phần bắn ra ngoài
+        if is_noisy and np.random.random() < 0.2:
             is_external = 0
             dst_ip = _random_ip(INTERNAL_SUBNETS)
         else:
             is_external = 1
             dst_ip = _random_ip(EXTERNAL_SUBNETS)
 
-        # Port phổ biến cho exfiltration
-        if is_noisy and np.random.random() < 0.3:
-            dst_port = int(np.random.choice([22, 53, 3306, 5432]))
-        else:
-            dst_port = int(np.random.choice(LEAKAGE_PORTS))
-
+        dst_port = int(np.random.choice([22, 53, 3306] if (is_noisy and np.random.random() < 0.4) else LEAKAGE_PORTS))
         protocol = np.random.choice(PROTOCOLS, p=PROTOCOL_WEIGHTS_LEAKAGE)
 
-        # Lưu lượng lớn: bytes_sent > 500 KB (trung bình ~1500 KB)
-        if is_noisy and np.random.random() < 0.3:
-            bytes_sent = float(np.random.exponential(200))  # có thể < 500
+        # TẠO NHIỄU GIẤU BÀI: Kẻ gian tuồn dữ liệu nhỏ giọt (Drip Exfiltration) để né ngưỡng
+        # Logistic Regression sẽ bỏ lọt (False Negative) cực nhiều nhóm này
+        if is_noisy and np.random.random() < 0.5:
+            bytes_sent = float(np.random.uniform(10, 150)) # Rất nhỏ, giống người hiền
         else:
-            bytes_sent = float(np.random.uniform(500, 5000))
+            bytes_sent = float(np.random.uniform(400, 4000))
 
-        bytes_recv = float(np.random.exponential(40))  # nhận ít
-        duration = float(np.random.uniform(60, 600))  # phiên dài hơn
+        bytes_recv = float(np.random.exponential(20)) # Hầu như không tải xuống
+        duration = float(np.random.uniform(60, 800))
 
         records.append({
             "timestamp": timestamp,
