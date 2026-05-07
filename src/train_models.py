@@ -29,7 +29,6 @@ def train_logistic_regression(X_train, y_train):
         max_iter=1000,
         class_weight="balanced",
         random_state=42,
-        verbose=1
     )
     model.fit(X_train, y_train)
 
@@ -63,7 +62,6 @@ def train_random_forest(X_train, y_train):
         class_weight="balanced",
         random_state=42,
         n_jobs=-1,
-        verbose=1
     )
     model.fit(X_train, y_train)
 
@@ -100,7 +98,6 @@ def train_isolation_forest(X_train, y_train):
         contamination=0.15,
         random_state=42,
         n_jobs=-1,
-        verbose=1
     )
     model.fit(X_train_normal)
 

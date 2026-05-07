@@ -173,6 +173,7 @@ def plot_roc_curves(y_true, models: dict, X_test):
                     label=f"{name} (AUC = {roc_auc:.3f})")
 
     ax.plot([0, 1], [0, 1], "k--", alpha=0.4, label="Random (AUC = 0.500)")
+    ax.set_xscale("log")
     ax.set_xlabel("False Positive Rate")
     ax.set_ylabel("True Positive Rate")
     ax.set_title("ROC Curve", fontsize=14, fontweight="bold")
