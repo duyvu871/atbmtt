@@ -31,12 +31,19 @@ Nếu bạn chỉ muốn chạy file script Python để sinh model và ảnh bi
 uv run run_demo.py
 ```
 
-**Bước 4: Trình diễn (Show Demo)**
-Mở và chạy file Notebook đã tạo thông qua Jupyter:
+**Bước 4: Trình diễn (Show Demo qua Notebook)**
+Mở và chạy file Notebook đã tạo thông qua Jupyter để phân tích từng bước tĩnh:
 ```bash
 uv run jupyter notebook demo_notebook.ipynb
 ```
 Hoặc bạn có thể mở trực tiếp file `demo_notebook.ipynb` trong VSCode/Cursor.
+
+**Bước 5: Chạy Live Demo (Phát hiện thời gian thực)**
+Nếu bạn muốn biểu diễn kịch bản bắt log mạng và phán xử tự động bằng các mô hình trên màn hình Console (Terminal) theo thời gian thực:
+```bash
+uv run live_demo.py
+```
+Hệ thống sẽ giả lập luồng dữ liệu (traffic stream) và in ra các cảnh báo rò rỉ ngay lập tức.
 
 ---
 
